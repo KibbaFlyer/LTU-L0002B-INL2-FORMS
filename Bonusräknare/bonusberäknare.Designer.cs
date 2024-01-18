@@ -68,21 +68,23 @@ namespace Bonusräknare
             // 
             // buttonAdd
             // 
-            buttonAdd.Location = new Point(322, 21);
+            buttonAdd.Location = new Point(348, 21);
             buttonAdd.Name = "buttonAdd";
             buttonAdd.Size = new Size(154, 99);
             buttonAdd.TabIndex = 4;
             buttonAdd.Text = "Lägg till";
             buttonAdd.UseVisualStyleBackColor = true;
+            buttonAdd.Click += buttonAdd_Click;
             // 
             // buttonShow
             // 
-            buttonShow.Location = new Point(322, 144);
+            buttonShow.Location = new Point(348, 144);
             buttonShow.Name = "buttonShow";
             buttonShow.Size = new Size(154, 99);
             buttonShow.TabIndex = 5;
             buttonShow.Text = "Visa resultat";
             buttonShow.UseVisualStyleBackColor = true;
+            buttonShow.Click += buttonShow_Click;
             // 
             // label1
             // 
@@ -105,6 +107,7 @@ namespace Bonusräknare
             // inputSold
             // 
             inputSold.Location = new Point(24, 204);
+            inputSold.Maximum = new decimal(new int[] { 99999999, 0, 0, 0 });
             inputSold.Name = "inputSold";
             inputSold.Size = new Size(266, 39);
             inputSold.TabIndex = 8;
@@ -122,7 +125,7 @@ namespace Bonusräknare
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(496, 330);
+            ClientSize = new Size(547, 330);
             Controls.Add(label2);
             Controls.Add(inputSold);
             Controls.Add(outputCount);
@@ -132,6 +135,7 @@ namespace Bonusräknare
             Controls.Add(inputDistrikt);
             Controls.Add(inputPersnr);
             Controls.Add(inputNamn);
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Name = "userInput";
             Text = "Bonusberäknare";
             ((System.ComponentModel.ISupportInitialize)inputSold).EndInit();
@@ -150,26 +154,52 @@ namespace Bonusräknare
         private Label outputCount;
         private NumericUpDown inputSold;
         private Label label2;
-        private Dictionary<Bonusräknare.Person, int> personResultat;
+        private Dictionary<Bonusräknare.Person, int> personResultat = new Dictionary<Person, int>();
 
+        // Här har vi en metod som kallas när användaren klickar på knappen "Lägg till"
         private void AddPerson()
         {
+            // Vi börjar med att hämta data från infälten
             string name = inputNamn.Text;
             string persnr = inputPersnr.Text;
             string distrikt = inputDistrikt.Text;
-            int sold = Convert.ToInt16(inputSold.Value);
-            // Vi skapar en ny person och ger den data
+            int sold = Convert.ToInt32(inputSold.Value);
+            // Vi skapar en ny person
             Person person = new Person();
-            person.AddData(name, persnr, distrikt);
+            // Bool för att hantera error
+            bool errorOccurred = false;
             // Nu lägger vi till personen och dess säljresultat till dictionary
-            personResultat.Add(person, sold);
+            try
+            {
+                person.AddData(name, persnr, distrikt);
+                personResultat.Add(person, sold);
+            }
+            // Det finns ett exception i klassen "Person" som skickas om inte all indata är ifylld
+            catch (Exception x)
+            {
+                MessageBox.Show(x.Message);
+                errorOccurred = true;
+            }
+            // För användarvänlighetens skull återställer vi infält endast om vi lyckades lägga till personen
+            // På det viset behöver inte användaren ange fält igen om de råkade missa något
+            if (!errorOccurred)
+            {
+                //Sedan tar vi bort data
+                inputNamn.Clear();
+                inputPersnr.Clear();
+                inputDistrikt.Clear();
+                inputSold.Value = 0;
+            }
+            // Vi ändrar label till antal 
+            outputCount.Text = personResultat.Count.ToString();
         }
+        // När användaren väljer att visa data triggas denna metod
+        // Den öppnar upp ett nytt resultatfönster med dictionary som den har sparat ersoner och säljresultat på
+        // Jag har valt att lämna det "smarta" i resultatfönstret logik, så blir koden mer modulär
         private void ShowData()
         {
-            resultat resultWindow = new resultat();
+            resultat resultWindow = new resultat(personResultat);
             resultWindow.ShowDialog();
         }
-
-
     }
 }

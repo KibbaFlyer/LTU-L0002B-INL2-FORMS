@@ -6,5 +6,15 @@ namespace Bonusräknare
         {
             InitializeComponent();
         }
+
+        private void buttonAdd_Click(object sender, EventArgs e)
+        {
+            AddPerson();
+        }
+
+        private void buttonShow_Click(object sender, EventArgs e)
+        {
+            ShowData();
+        }
     }
 }

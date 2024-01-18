@@ -8,25 +8,46 @@ using System.Xml;
 
 namespace Bonusräknare
 {
-    internal class Person
+    // Denna klass representerar en person, med olika data kopplad till sig
+    public class Person
     {
         private string namn;
         private string persnr;
         private string distrikt;
 
-        public object AddData(string _namn, string _persnr, string _disktrikt)
+        public void AddData(string _namn, string _persnr, string _disktrikt)
         {
-            if (_namn != null && _persnr != null && _disktrikt != null) 
+            if (_namn != "" && _persnr != "" && _disktrikt != "") 
             {
                 namn = _namn;
                 persnr = _persnr;
                 distrikt = _disktrikt;
-                return this;
             }
             else 
-            { //error
-                throw new InvalidOperationException("Namn, Personnummer och distrikt måste anges");
+            {
+                throw new ArgumentException("Namn, Personnummer och distrikt måste anges");
             }
+        }
+        public string Namn
+        { 
+            get 
+            { 
+                return namn; 
+            } 
+        }
+        public string Persnr
+        { 
+            get 
+            { 
+                return persnr; 
+            } 
+        }
+        public string Distrikt
+        { 
+            get 
+            { 
+                return distrikt; 
+            } 
         }
     }
 }
